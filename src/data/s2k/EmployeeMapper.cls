@@ -4,7 +4,7 @@
     binary, for any purpose, commercial or non-commercial, and by any
     means.  **/
  /*------------------------------------------------------------------------
-    File        : DepartmentMapper
+    File        : EmployeeMapper
     Purpose     : 
     Syntax      : 
     Description : 
@@ -14,20 +14,19 @@
   ----------------------------------------------------------------------*/
 block-level on error undo, throw.
 
-using data.s2k.DepartmentRecord.
+using data.s2k.EmployeeRecord.
 using data.shared.BufferMapper.
-using data.shared.IRecord.
 
-class data.s2k.DepartmentMapper inherits BufferMapper:
+class data.s2k.EmployeeMapper inherits BufferMapper:
     
-    constructor public DepartmentMapper(input pBuffer as handle):
+    constructor public EmployeeMapper(input pBuffer as handle):
         super(pBuffer, 
               // we want to create department records
-              get-class(DepartmentRecord)).
+              get-class(EmployeeRecord)).
     end constructor.
     
-    constructor public DepartmentMapper():
-        this-object(buffer Department:handle). 
+    constructor public EmployeeMapper():
+        this-object(buffer Employee:handle). 
     end constructor.
     
 end class.

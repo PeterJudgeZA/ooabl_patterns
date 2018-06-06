@@ -20,6 +20,7 @@ using data.shared.IMapper.
 using data.shared.IRecord.
 using data.shared.RecordCollection.
 using OpenEdge.Core.Collections.IIterator.
+using Progress.Lang.AppError.
 
 class data.shared.BufferMapper implements IMapper:
     // what type of IRecord should we create
@@ -43,10 +44,12 @@ class data.shared.BufferMapper implements IMapper:
         define variable loop as integer no-undo.
         define variable fld as handle no-undo.
         
+        assign pWhere = trim(pWhere, 'where ').
+        
         create query dataQuery.
         dataQuery:set-buffers(this-object:DataBuffer).
         dataQuery:query-prepare(substitute('for each &1 where &2 no-lock',
-                                    this-object:DataBuffer,
+                                    this-object:DataBuffer:name,
                                     pWhere)).
         dataQuery:query-open().
         
@@ -55,7 +58,6 @@ class data.shared.BufferMapper implements IMapper:
         dataQuery:get-first().
         do:
             record = cast(this-object:RecordType:New(), IRecord).   
-            //
             props = this-object:RecordType:GetProperties((Flags:Public or Flags:Instance)).
             cnt = extent(props).
             do loop = 1 to cnt:
@@ -64,7 +66,7 @@ class data.shared.BufferMapper implements IMapper:
                 // assumes no arrays, names are identical
                 assign fld = this-object:DataBuffer:buffer-field(props[loop]:Name) no-error.
                 if valid-handle(fld) then
-                    dynamic-property(data, props[loop]:Name) = this-object:DataBuffer:buffer-field(props[loop]:Name):buffer-value.
+                    dynamic-property(record, props[loop]:Name) = this-object:DataBuffer:buffer-field(props[loop]:Name):buffer-value.
             end.
             //
             data:Add(record). 
@@ -183,12 +185,20 @@ class data.shared.BufferMapper implements IMapper:
         define variable loop as integer no-undo.
         define variable fld as handle no-undo.
         
+        if num-entries(this-object:DataBuffer:keys) ne 1 then
+            undo, throw new AppError(substitute('BufferMapper currently only supported single-field keys. &1 has &2',
+                                        this-object:DataBuffer:name,
+                                        this-object:DataBuffer:keys)
+                                     , 0).
+        
         do transaction:
+            fld = this-object:DataBuffer:buffer-field(this-object:DataBuffer:keys).
             // simplified FIND. Doesn't deal with multiple keys and non-char values
             this-object:DataBuffer:find-first(substitute('where &1.&2 = "&3"',
                                              this-object:DataBuffer:name,
-                                             this-object:DataBuffer:keys), 
-                               exclusive-lock).
+                                             fld:name,
+                                             dynamic-property(pData, fld:Name)  ), 
+                                   exclusive-lock).
             
             props = this-object:RecordType:GetProperties((Flags:Public or Flags:Instance)).
             cnt = extent(props).

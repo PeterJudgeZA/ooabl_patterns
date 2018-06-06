@@ -13,9 +13,9 @@
   ----------------------------------------------------------------------*/
 block-level on error undo, throw.
 
+using data.s2k.DepartmentMapper.
 using data.s2k.DepartmentRecord.
-using data.s2k.EmployeeRecord.
-using data.shared.BufferMapper.
+using data.s2k.EmployeeMapper.
 using data.shared.IMapper.
 
 class data.s2k.DepartmentDAO:
@@ -29,20 +29,17 @@ class data.s2k.DepartmentDAO:
                this-object:EmployeeMapper   = pEmpMapper
                . 
     end constructor.
-
+    
     // Defaults: probably not a good idea for real life
     constructor public DepartmentDAO():
-        this-object(new BufferMapper(buffer Department:handle,
-                                     get-class(DepartmentRecord)),
-                    new BufferMapper(buffer Employee:handle,
-                                     get-class(EmployeeRecord)) ).
+        this-object(new DepartmentMapper(), new EmployeeMapper() ).
     end constructor.
-                
+    
     method public DepartmentRecord Load(input pWhere as character):
         define variable recDept as DepartmentRecord no-undo.
         
-        recDept = cast(DepartmentMapper:Find(pWhere), DepartmentRecord).
-        recDept:Employees = EmployeeMapper:ForEach(pWhere).
+        recDept = cast(DepartmentMapper:Get(pWhere), DepartmentRecord).
+        recDept:Employees = EmployeeMapper:GetAll(pWhere).
         
         return recDept.                    
     end method.
