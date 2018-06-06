@@ -1,5 +1,5 @@
 # ooabl_patterns
-Sample code for OOABL Design Patterns talks given at the 2017 [EMEA PUG Challenge](https://pugchallenge.eu/). The presentation is in this project ion PDF form: advanced_ooabl_patterns.pdf . 
+Sample code for OOABL Design Patterns talks given at the 2017 [EMEA PUG Challenge](https://pugchallenge.eu/). The presentation is in this project in PDF form: advanced_ooabl_patterns.pdf . 
 
 You will need a version of the Sports2000 database. Create one via `proenv` and `prodb path/to/project/sports2000 sports2000` (or wherever you choose). Add it to your workspace with an alias of `s2k` and it'll be added to the project.
 
